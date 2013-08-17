@@ -68,7 +68,7 @@ class Mouse
 
   # Clicks a mouse button.
   def click(button)
-    XDo::FFILib.xdo_click @_xdo_pointer, 0, button
+    XDo::FFILib.xdo_click_window @_xdo_pointer, 0, button
   end
 
   # Presses a mouse button.
