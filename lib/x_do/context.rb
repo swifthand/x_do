@@ -12,7 +12,7 @@ class XDo
     @keyboard = XDo::Keyboard.new self
     @mouse = XDo::Mouse.new self
   end
-  
+
   # Releases resources associated with this context.
   def close
     return unless @_context
@@ -20,28 +20,28 @@ class XDo
     @_pointer = nil
     @_context = nil
   end
-  
+
   # :nodoc: automatically close contexts as they go out of scope.
   def finalize
     close
   end
-  
+
   # The display name for the current context.
   def display_name
     @_context[:display_name]
   end
-  
+
   # The underlying libxdo context structure.
   attr_accessor :_context
   # Pointer to the underlying _libxdo context structure.
   attr_accessor :_pointer
-  
+
   # The keyboard state for this context.
   attr_accessor :keyboard
 
   # The mouse state for this context.
   attr_accessor :mouse
-  
+
   # Returns X windows matching a query.
   #
   # Args:
@@ -60,37 +60,37 @@ class XDo
     query = XDo::FFILib::XDoSearch.from_options options
     windows_pointer = FFI::MemoryPointer.new :pointer, 1
     count_pointer = FFI::MemoryPointer.new :ulong, 1
-    XDo::FFILib.xdo_window_search @_pointer, query, windows_pointer,
+    XDo::FFILib.xdo_search_windows @_pointer, query, windows_pointer,
                                   count_pointer
     count = count_pointer.read_ulong
     windows = windows_pointer.read_pointer.read_array_of_long(count)
     windows.map { |window| XDo::Window.new self, window }
   end
-  
+
   # Returns the currently active X window.
   def active_window
     window_pointer = FFI::MemoryPointer.new :ulong, 1
-    XDo::FFILib.xdo_window_get_active @_pointer, window_pointer
+    XDo::FFILib.xdo_get_active_window @_pointer, window_pointer
     XDo::Window.new self, window_pointer.read_ulong
   end
-  
+
   # Returns the X window that has the input focus.
   def focused_window
     window_pointer = FFI::MemoryPointer.new :ulong, 1
-    XDo::FFILib.xdo_window_get_focus @_pointer, window_pointer
+    XDo::FFILib.xdo_get_focused_window @_pointer, window_pointer
     XDo::Window.new self, window_pointer.read_ulong
   end
 
   # Returns the "real" X window that has the input focus.
   #
-  # This calls xdo_window_sane_get_focus instead of xdo_window_get_focus and is
+  # This calls xdo_get_focused_window_sane instead of xdo_get_focused_window and is
   # recommended.
   def real_focused_window
     window_pointer = FFI::MemoryPointer.new :ulong, 1
-    XDo::FFILib.xdo_window_sane_get_focus @_pointer, window_pointer
+    XDo::FFILib.xdo_get_focused_window_sane @_pointer, window_pointer
     XDo::Window.new self, window_pointer.read_ulong
   end
-  
+
   # The version of the underlying library.
   #
   # This method is mostly useful as a health check on your installtion. A

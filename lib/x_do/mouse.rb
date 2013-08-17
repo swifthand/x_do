@@ -14,20 +14,20 @@ class Mouse
     @xdo = xdo
     @_xdo_pointer = xdo._pointer
   end
-  
+
   # The XDo context that produced the window.
   attr_accessor :xdo
-  
+
   # [x, y, screen] array of mouse coordinates.
   def location
     x_pointer = FFI::MemoryPointer.new :int, 1
     y_pointer = FFI::MemoryPointer.new :int, 1
     screen_pointer = FFI::MemoryPointer.new :int, 1
-    XDo::FFILib.xdo_mouselocation @_xdo_pointer, x_pointer, y_pointer,
-                                  screen_pointer
+    XDo::FFILib.xdo_get_mouse_location @_xdo_pointer, x_pointer, y_pointer,
+                                       screen_pointer
     [x_pointer.read_int, y_pointer.read_int, screen_pointer.read_int]
   end
-  
+
   # Moves the mouse to a new position.
   def move(x, y, screen)
     old_location = self.location
@@ -39,7 +39,7 @@ class Mouse
 
   # Queues a mouse move request to the X server.
   def move_async(x, y, screen)
-    XDo::FFILib.xdo_mousemove @_xdo_pointer, x, y, screen
+    XDo::FFILib.xdo_move_mouse @_xdo_pointer, x, y, screen
   end
 
   # Moves the mouse relatively to its current position.
@@ -53,19 +53,19 @@ class Mouse
 
   # Queues a mouse move request to the X server.
   def move_relative_async(dx, dy)
-    XDo::FFILib.xdo_mousemove_relative @_xdo_pointer, dx, dy
+    XDo::FFILib.xdo_move_mouse_relative @_xdo_pointer, dx, dy
   end
 
   # Blocks until the mouse moves away from a position on screen.
   def wait_for_move_from(x, y)
-    XDo::FFILib.xdo_mouse_wait_for_move_from @_xdo_pointer, x, y
+    XDo::FFILib.xdo_wait_for_mouse_move_from @_xdo_pointer, x, y
   end
-  
+
   # Blocks until the mouse moves to a position on screen.
   def wait_for_move_to(x, y)
-    XDo::FFILib.xdo_mouse_wait_for_move_to @_xdo_pointer, x, y
+    XDo::FFILib.xdo_wait_for_mouse_move_to @_xdo_pointer, x, y
   end
-  
+
   # Clicks a mouse button.
   def click(button)
     XDo::FFILib.xdo_click @_xdo_pointer, 0, button
